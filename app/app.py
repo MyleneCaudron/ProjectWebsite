@@ -39,7 +39,7 @@ print(f"...................................{playlist}")
 
 music_choice = st.radio(
      "Choose your favorite music",
-     (f'{playlist[0]}', f'{playlist[1]}', f'{playlist[2]}',f'{playlist[3]}'))
+     (f'{playlist.iloc[0]}', f'{playlist.iloc[1]}', f'{playlist.iloc[2]}',f'{playlist.iloc[3]}'))
 
 st.write('You selected :',music_choice)
 
