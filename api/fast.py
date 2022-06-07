@@ -1,9 +1,9 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import pandas as pd
-from TaxiFareModel.utils import pickup_datetime_conversion
-from predict import get_model
 import joblib
+from api.params import path_to_entire_dataset, path_to_models_folder
 
 app = FastAPI()
 
@@ -17,38 +17,40 @@ app.add_middleware(
 
 @app.get("/")
 def index():
-    return {"greeting": "Hello spotifier !"}
+    return {"greeting": "Hello !"}
 
 @app.get("/centroids")
 def centroids(activity):
     """
     It returns the activity centroids
     """
+    df_centroids = pd.read_csv(os.path.join("api", "centroids",
+                                            f"{activity}_playlist.csv")).T
+
+    df_centroids["centroid_index"] = [i for i in range(len(df_centroids))]
+    df_centroids["global_df_index"] = df_centroids.index
+    df_centroids.reset_index(drop=True, inplace=True)
+
+    dict_centroids = df_centroids.T.to_dict()
+
+    return dict_centroids
 
 
-    return {"fare": "result_model"}
+@app.get("/playlistselected")
+def playlistselected(activity, centroid_selected):
+    """
+    From the centroid selected it returns the playlist derived from the
+    KNN of the big dataset
+    """
 
-def centroids(activity):
+    df_restored = pd.DataFrame(centroids(activity)).T.drop(columns=
+                                                           ["global_df_index",
+                                                            "centroid_index"])
+    df_centroid_selected=df_restored[df_restored.index == int(centroid_selected)]
 
-    key = f"{pickup_datetime}.0{passenger_count}.0000001"
+    X = df_centroid_selected.copy()
 
-    pickup_datetime = pickup_datetime_conversion(pickup_datetime)
-    pickup_longitude = float(pickup_longitude)
-    pickup_latitude = float(pickup_latitude)
-    dropoff_longitude = float(dropoff_longitude)
-    dropoff_latitude = float(dropoff_latitude)
-    passenger_count = int(passenger_count)
+    model = joblib.load("KNNmodel.joblib")
 
-    dict_values = { "key": [key],
-                    "pickup_datetime": [pickup_datetime],
-                    "pickup_longitude": [pickup_longitude],
-                    "pickup_latitude": [pickup_latitude],
-                    "dropoff_longitude": [dropoff_longitude],
-                    "dropoff_latitude": [dropoff_latitude],
-                    "passenger_count": [passenger_count]}
-    X_test = pd.DataFrame(dict_values)
-
-    model = joblib.load("model.joblib")
-
-    prediction = model.predict(X_test)
-    return {"fare": prediction[0]}
+    prediction = model.kneighbors(n_neigbours = 10)
+    return {"playlist": prediction}

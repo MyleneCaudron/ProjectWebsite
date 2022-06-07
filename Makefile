@@ -102,3 +102,10 @@ Kmeans_local:
 
 NLP_local:
 	@python -m ${PACKAGE_NAME}.NLPpipeline
+
+#######################################
+#                 API
+######################################
+# load web server with code autoreload
+run_api:
+	uvicorn api.fast:app --reload
