@@ -27,13 +27,15 @@ params_activity = dict(activity = activity)
 
 response = requests.get(url, params=params_activity)
 
-centroids = response.json()
+dict_centroids = response.json()
 
-playlist = []
-nb = centroids.shape[1]
+df_restored = pd.DataFrame(dict_centroids).T.drop(
+    columns=["global_df_index", "centroid_index"])
 
-for i  in range(0,nb):
-    playlist.append(centroids['artist_name','track_name'].iloc[[i]])
+df_centroids = df_restored[['artist_name','track_name']]
+playlist = df_centroids.copy()
+
+print(f"...................................{playlist}")
 
 music_choice = st.radio(
      "Choose your favorite music",
