@@ -25,7 +25,11 @@ def centroids(activity):
     It returns the activity centroids
     """
     df_centroids = pd.read_csv(os.path.join("api", "centroids",
-                                            f"{activity}_playlist.csv")).T
+                                            f"{activity}_playlist.csv"),
+                  on_bad_lines='skip', index_col=[0]).T
+
+    print(f"""---------------------------------
+          {df_centroids.columns}""")
 
     df_centroids["centroid_index"] = [i for i in range(len(df_centroids))]
     df_centroids["global_df_index"] = df_centroids.index
@@ -36,19 +40,25 @@ def centroids(activity):
     return dict_centroids
 
 
-@app.get("/playlistselected")
+@app.get("/playlist")
 def playlistselected(activity, centroid_selected):
     """
     From the centroid selected it returns the playlist derived from the
     KNN of the big dataset
     """
+    df_merged_copy = pd.read_csv()
 
     df_restored = pd.DataFrame(centroids(activity)).T.drop(columns=
                                                            ["global_df_index",
                                                             "centroid_index"])
     df_centroid_selected=df_restored[df_restored.index == int(centroid_selected)]
 
-    X = df_centroid_selected.copy()
+    df_centroid_preproc = df_merged_copy[df_merged_copy["artist_name"]
+                                         == df_centroid_selected["artist_name"] &
+                                         df_merged_copy["track_name"]
+                                         == df_centroid_selected["track_name"]]
+
+    X = df_centroid_preproc.copy()
 
     model = joblib.load("KNNmodel.joblib")
 
