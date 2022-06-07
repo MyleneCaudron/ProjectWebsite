@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import requests
-from api.params import url_base
+#from api.params import url_base
+
+url_base = "http://127.0.0.1:8000"
 
 '''
 # Playlist project front
@@ -35,11 +37,12 @@ df_restored = pd.DataFrame(dict_centroids).T.drop(
 df_centroids = df_restored[['artist_name','track_name']]
 playlist = df_centroids.copy()
 
-print(f"...................................{playlist}")
+#print(f"...................................{playlist}")
 
 music_choice = st.radio(
      "Choose your favorite music",
-     (f'{playlist.iloc[0]}', f'{playlist.iloc[1]}', f'{playlist.iloc[2]}',f'{playlist.iloc[3]}'))
+     (f'0_{playlist.iloc[0]}', f'1_{playlist.iloc[1]}', f'2_{playlist.iloc[2]}',f'3_{playlist.iloc[3]}'))
+
 
 st.write('You selected :',music_choice)
 
@@ -48,8 +51,21 @@ st.write('You selected :',music_choice)
 url = f'{url_base}/playlist'
 
 params_playlist = params_activity
-params_playlist["centroid"] = playlist.index(music_choice)
+print("====================")
+print(music_choice.split("_"))
+list_split = music_choice.split("_")
+print(list_split[0])
+print("==================")
+
+params_playlist=params_activity
+params_playlist["centroid"] = list_split[0]
 
 response = requests.get(url,params_playlist)
 
+print(response.json())
+
+df_restored = pd.DataFrame(response).T
+
+print(df_restored)
+st.dataframe(df_restored)
 playlist = response.json()
