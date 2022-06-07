@@ -3,11 +3,11 @@ mkdir -p ~/.streamlit/
 echo "\
 [general]\n\
 email = \"m.celina.bermudez@gmail.com\"\n\
-" > ~/.streamlit/config.toml
+" > ~/.streamlit/credentials.toml
 
 echo "\
 [server]\n\
-hardless = true\n\
+headless = true\n\
 enableCORS=false\n\
 port = $PORT\n\
 " > ~/.streamlit/config.toml
