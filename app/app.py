@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import requests
+from api.params import url_base
 
 '''
 # Playlist project front
@@ -20,11 +21,11 @@ st.write('My activity:', activity)
 
 
 # First predict To display the list with 4 centroids
-url = 'http://localhost:8501/centroids'
+url = f'{url_base}/centroids'
 
-params = dict(activity = activity)
+params_activity = dict(activity = activity)
 
-response = requests.get(url, params=params)
+response = requests.get(url, params=params_activity)
 
 centroids = response.json()
 
@@ -42,10 +43,11 @@ st.write('You selected :',music_choice)
 
 # Second predict To display the final playlist
 
-url = 'http://localhost:8501/playlist'
+url = f'{url_base}/playlist'
 
-params = dict(key = music_choice)
+params_playlist = params_activity
+params_playlist["centroid"] = playlist.index(music_choice)
 
-response = requests.get(url,params)
+response = requests.get(url,params_playlist)
 
 playlist = response.json()

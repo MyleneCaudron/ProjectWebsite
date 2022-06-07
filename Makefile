@@ -4,7 +4,7 @@
 # ----------------------------------
 
 streamlit:
-	-@streamlit run app.py
+	-@streamlit run app/app.py
 
 heroku_login:
 	-@heroku login

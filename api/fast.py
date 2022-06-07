@@ -25,7 +25,11 @@ def centroids(activity):
     It returns the activity centroids
     """
     df_centroids = pd.read_csv(os.path.join("api", "centroids",
-                                            f"{activity}_playlist.csv")).T
+                                            f"{activity}_playlist.csv"),
+                  on_bad_lines='skip', index_col=[0]).T
+
+    print(f"""---------------------------------
+          {df_centroids.columns}""")
 
     df_centroids["centroid_index"] = [i for i in range(len(df_centroids))]
     df_centroids["global_df_index"] = df_centroids.index
@@ -36,7 +40,7 @@ def centroids(activity):
     return dict_centroids
 
 
-@app.get("/playlistselected")
+@app.get("/playlist")
 def playlistselected(activity, centroid_selected):
     """
     From the centroid selected it returns the playlist derived from the
